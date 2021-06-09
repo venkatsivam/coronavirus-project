@@ -6,6 +6,7 @@ import re
 import time
 import threading
 import sys
+from covid_plot import*
 
 API_KEY= "tQdfPFM_soCT"
 PROJECT_TOKEN= "tpHxwKtKdBaz"
@@ -13,7 +14,6 @@ RUN_TOKEN= "tptbVEDn9ozf"
 
 class Data:
     def __init__(self,api_key,project_token,run_token):
-        # print(run_token)
         self.api_key=api_key
         self.project_token=project_token
         self.run_token=run_token
@@ -21,10 +21,6 @@ class Data:
         self.data=self.get_data()
 
     def get_data(self):
-        # rend_response = requests.get(f'https://parsehub.com/api/v2/runs/{self.run_token}', params=self.params)
-        # print(self.run_token)# method,URL,header(authentication to access parsehub)
-        # print(json.loads(rend_response.text))
-        # sys.exit(1)
         response = requests.get(f'https://parsehub.com/api/v2/projects/{self.project_token}/last_ready_run/data',
                                 params=self.params)  # method,URL,header(authentication to access parsehub)
         data = json.loads(response.text)  # to convert the response data into jason format(key & Value)
@@ -66,22 +62,16 @@ class Data:
         print("updating")
         response = requests.post(f'https://www.parsehub.com/api/v2/projects/{self.project_token}/run',
                                  params=self.params)
-        # data = json.loads(response.text)
-        # print(data)
         def poll():
             time.sleep(0.1)
             old_data = self.data
-            # print(old_data)
             while True:
                 new_data = self.get_data()
                 # print(new_data)
                 if new_data != old_data:
                     self.data = new_data
                     print("Data updated")
-                    # main()
                     break
-                # else:
-                #     main()
                 time.sleep(5)
         t = threading.Thread(target=poll)
         t.start()
@@ -92,7 +82,6 @@ def speak(text):
     engine.runAndWait()
     print(text)
 
-# speak("how are you")
 def get_audio():
     r = sr.Recognizer()
     with sr.Microphone() as source:  # use the default microphone as the audio source
@@ -112,7 +101,7 @@ def main():
     print("Listening....")
     END_TEXT="stop"
     UPDATE_COMMAND = "update"
-    # print(END_TEXT)
+
     TOTAL_PATTERNS={re.compile("[\w\s]+ total [\w\s]+ cases"):covid_data.total_cases,
                     re.compile("[\w\s]+ total cases"): covid_data.total_cases,
                     re.compile("[\w\s]+ total [\w\s]+ deaths"):covid_data.total_deaths,
@@ -128,12 +117,11 @@ def main():
     while True:
         text=get_audio()
         print(text)
-        # print(UPDATE_COMMAND)
 
         for pattern,func in TOTAL_PATTERNS.items():
             if pattern.match(text):
                 result = func()
-                # return
+                c=""
 
         for pattern,func in COUNTRY_PATTERNS.items():
             if pattern.match(text):
@@ -142,17 +130,18 @@ def main():
                 for country in countries_list:
                     # print(country)
                     if country in sentence:
-                        # print(country)
+                        b=sentence[3]
+                        c=country
                         result=func(country)
-                        print(result)
+                        # print(result.lower())
                         # print(result)
                         # break
 
         if result != "NONE":
-            # print(text)
             speak(result)
+            if c!="":
+                plot=covidcasesplot(c,b)
             main()
-            break
 
         if text == UPDATE_COMMAND:
             result = "Data is being updated. This may take a moment!"
@@ -166,3 +155,4 @@ def main():
 
 print("Covid-19 recent data")
 main()
+
