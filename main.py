@@ -8,9 +8,9 @@ import threading
 import sys
 from covid_plot import*
 
-API_KEY= "tQdfPFM_soCT"
-PROJECT_TOKEN= "tpHxwKtKdBaz"
-RUN_TOKEN= "tptbVEDn9ozf"
+API_KEY= "XXXX"
+PROJECT_TOKEN= "XXXX"
+RUN_TOKEN= "XXXX"
 
 class Data:
     def __init__(self,api_key,project_token,run_token):
@@ -155,4 +155,3 @@ def main():
 
 print("Covid-19 recent data")
 main()
-

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 import mplcursors
+from TwitterBot import*
 
 def covidcasesplot(result,d):
     res=result.lower()
@@ -46,8 +47,13 @@ def covidcasesplot(result,d):
     plt.tight_layout()
     ax.set_title("Covid new " + d + " in "+ res + " for last 6 days")
     mplcursors.cursor(hover=True)
+    plt.savefig('images/'+res+'.jpg')
+    upload_twitter = upload_media('images/' + res + '.jpg',"Covid new " + d + " in "+ res + " for last 6 days" )
     plt.show()
     return "0"
+
+
+
 
 
 
